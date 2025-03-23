@@ -1,14 +1,7 @@
 # dataset.yaml
-train: C:/Users/User/Desktop/Machine Vision Code/css-data/train/
-val: C:/Users/User/Desktop/Machine Vision Code/css-data/valid/
-test: C:/Users/User/Desktop/Machine Vision Code/css-data/test/
-
-# Class names
-names:
-  0: Hardhat
-  1: No-Hardhat
-  2: Mask
-  3: No-Mask
-  4: Safety-Vest
-  5: No-Safety-Vest
-  6: Worker
+train: /home/demo/MachineVisionProject/enhanced_images/train
+val: /home/demo/MachineVisionProject/css-data/valid
+test: /home/demo/MachineVisionProject/css-data/test
+nc: 10
+names: [Hardhat, Mask, NO-Hardhat, NO-Mask, NO-Safety Vest, Person, Safety Cone,
+    Safety Vest, machinery, vehicle]

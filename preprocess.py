@@ -7,37 +7,36 @@ import glob
 import os
 
 def enhance_images(input_folder, output_folder):
-    """Apply CLAHE enhancement to images."""
+    """Apply CLAHE enhancement to images recursively."""
     os.makedirs(output_folder, exist_ok=True)
     
-    # Create CLAHE object
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     
-    # Get all images
-    image_paths = glob.glob(os.path.join(input_folder, "*.jpg"))
+    # Use recursive glob pattern
+    image_paths = glob.glob(os.path.join(input_folder, "**", "*.jpg"), recursive=True)
     
     for img_path in image_paths:
-        # Read image
         img = cv2.imread(img_path)
+        if img is None:
+            print(f"Could not read image: {img_path}")
+            continue
         
-        # Convert to LAB color space
+        # Convert to LAB, apply CLAHE, and convert back
         lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
         l, a, b = cv2.split(lab)
-        
-        # Apply CLAHE to L channel
         cl = clahe.apply(l)
-        
-        # Merge channels
         merged = cv2.merge((cl, a, b))
-        
-        # Convert back to BGR
         enhanced_img = cv2.cvtColor(merged, cv2.COLOR_LAB2BGR)
         
-        # Save enhanced image
-        output_path = os.path.join(output_folder, os.path.basename(img_path))
-        cv2.imwrite(output_path, enhanced_img)
+        # Preserve subfolder structure
+        relative_path = os.path.relpath(img_path, input_folder)
+        output_path = os.path.join(output_folder, relative_path)
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
         
+        cv2.imwrite(output_path, enhanced_img)
+    
     print(f"Enhanced {len(image_paths)} images")
+
 
 def create_custom_augmentations():
     """Create a pipeline of augmentations for training data."""
@@ -87,3 +86,13 @@ def apply_augmentations(image_path, label_path, transform):
     transformed = transform(image=image, bboxes=bboxes, class_labels=class_labels)
     
     return transformed['image'], transformed['bboxes'], transformed['class_labels']
+
+
+if __name__ == "__main__":
+    input_folder = "/home/demo/MachineVisionProject/css-data"
+    output_folder = "/home/demo/MachineVisionProject/enhanced_images"
+
+    print(f"Enhancing images from {input_folder} and saving to {output_folder}...")
+    enhance_images(input_folder, output_folder)
+    print("Enhancement completed.")
+
